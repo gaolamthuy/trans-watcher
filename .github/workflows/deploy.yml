@@ -22,7 +22,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             # Remove the old .env file if it exists
-            sudo rm -f ~/vcb-trans-watchdog/.env
+            # sudo rm -f ~/vcb-trans-watchdog/.env
 
             # Create a new .env file with secrets
             echo "VCB_API_URL=${{ secrets.VCB_API_URL }}" | sudo tee -a .env 
