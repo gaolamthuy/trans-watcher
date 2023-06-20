@@ -2,10 +2,12 @@ import "dotenv/config";
 import axios from "axios";
 import dayjs = require("dayjs");
 import customParseFormat = require("dayjs/plugin/customParseFormat");
-import isSameOrAfter = require("dayjs/plugin/isSameOrAfter")
+import isSameOrAfter = require("dayjs/plugin/isSameOrAfter");
+import isSameOrBefore = require("dayjs/plugin/isSameOrBefore");
 import { sendDiscord } from "./notification";
 dayjs.extend(customParseFormat);
-dayjs.extend(isSameOrAfter)
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 type Transaction = {
   PCTime: string;
@@ -13,7 +15,7 @@ type Transaction = {
   // Add other properties relevant to your transactions
 };
 
-const secondsThreshold = 3000;
+const secondsThreshold = 300;
 
 function formatNumberToSixDigits(PCTime: string): string {
   if (PCTime) {
@@ -22,7 +24,10 @@ function formatNumberToSixDigits(PCTime: string): string {
   return "";
 }
 
-function getTransTimeAsDayjs(dateString: string, timeString: string): dayjs.Dayjs {
+function getTransTimeAsDayjs(
+  dateString: string,
+  timeString: string
+): dayjs.Dayjs {
   const formattedDateTime = `${dateString} ${timeString}`;
   const dayjsObject = dayjs(formattedDateTime, "DD/MM/YYYY HHmmss");
   return dayjsObject;
@@ -68,15 +73,17 @@ async function checkNewTrans(
   secondsThreshold: number
 ): Promise<Transaction[]> {
   const transactions = await getTransactions();
-  const now = getNowMinusSeconds(secondsThreshold);
+  const nowMinus = getNowMinusSeconds(secondsThreshold);
 
   const newTransactions = transactions.filter((transaction) => {
-    const transactionDate = transaction.tranDate
+    const transactionDate = transaction.tranDate;
     const transactionTime = formatNumberToSixDigits(transaction.PCTime);
-    const transTime = getTransTimeAsDayjs(transactionDate,transactionTime);
-    console.log("transTime: ",transTime.format("DD/MM/YY HH:mm:ss"))
-    console.log("now: ", now.format("DD/MM/YY HH:mm:ss"))
-    return transTime.isSameOrAfter(now);
+    const transTime = getTransTimeAsDayjs(transactionDate, transactionTime);
+    // console.log("transTime: ", transTime.format("DD/MM/YY HH:mm:ss"));
+    // console.log("now: ", nowMinus.format("DD/MM/YY HH:mm:ss"));
+    return (
+      transTime.isSameOrAfter(nowMinus) && transTime.isSameOrBefore(dayjs())
+    );
   });
 
   return newTransactions;
@@ -84,9 +91,13 @@ async function checkNewTrans(
 
 checkNewTrans(getTodayTrans, secondsThreshold)
   .then((newTransactions) => {
+    if (newTransactions.length === 0) {
+      console.log("No new transactions.");
+      return;
+    }
     console.log(`There are ${newTransactions.length} new transactions.`);
     console.log("New Transactions:", JSON.stringify(newTransactions));
-    sendDiscord("hi test")
+    // sendDiscord("hi test");
   })
   .catch((error) => {
     console.error("Error:", error);
