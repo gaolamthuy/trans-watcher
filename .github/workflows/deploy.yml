@@ -25,11 +25,11 @@ jobs:
             sudo rm -f ~/vcb-trans-watchdog/.env
 
             # Create a new .env file with secrets
-            sudo echo "VCB_API_URL=${{ secrets.VCB_API_URL }}" >> ~/vcb-trans-watchdog/.env
-            sudo echo "VCB_USERNAME=${{ secrets.VCB_USERNAME }}" >> ~/vcb-trans-watchdog/.env
-            sudo echo "VCB_PASSWORD=${{ secrets.VCB_PASSWORD }}" >> ~/vcb-trans-watchdog/.env
-            sudo echo "VCB_ACCOUNT_NUMBER=${{ secrets.VCB_ACCOUNT_NUMBER }}" >> ~/vcb-trans-watchdog/.env
-            sudo echo "DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}" >> ~/vcb-trans-watchdog/.env
+            echo "VCB_API_URL=${{ secrets.VCB_API_URL }}" | sudo tee -a .env 
+            echo "VCB_USERNAME=${{ secrets.VCB_USERNAME }}" | sudo tee -a .env 
+            echo "VCB_PASSWORD=${{ secrets.VCB_PASSWORD }}" | sudo tee -a .env 
+            echo "VCB_ACCOUNT_NUMBER=${{ secrets.VCB_ACCOUNT_NUMBER }}" | sudo tee -a .env 
+            echo "DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}" | sudo tee -a .env 
 
             # Add any additional deployment commands
             sduo echo "Deploying via SSH..."
