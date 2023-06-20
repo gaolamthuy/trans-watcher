@@ -1,0 +1,30 @@
+{
+  "name": "tsnode-test",
+  "version": "1.0.0",
+  "description": "This is boilerplate code for creating Typescript projects in a Node environment.\r After following  the instructions you will have the basic functionality to run a Typescript project with `ts-node` included to your project folder.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hophamlam/tsnode-test.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hophamlam/tsnode-test/issues"
+  },
+  "homepage": "https://github.com/hophamlam/tsnode-test#readme",
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.3"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "croner": "^6.0.4",
+    "dayjs": "^1.11.8",
+    "dotenv": "^16.3.1"
+  }
+}
