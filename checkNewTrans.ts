@@ -16,14 +16,14 @@ type Transaction = {
   // Add other properties relevant to your transactions
 };
 
-function formatNumberToSixDigits(PCTime: string): string {
+export function formatNumberToSixDigits(PCTime: string): string {
   if (PCTime) {
     return PCTime.padStart(6, "0");
   }
   return "";
 }
 
-function getTransTimeAsDayjs(
+export function getTransTimeAsDayjs(
   dateString: string,
   timeString: string
 ): dayjs.Dayjs {
