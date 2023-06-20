@@ -4,18 +4,17 @@ import dayjs = require("dayjs");
 import customParseFormat = require("dayjs/plugin/customParseFormat");
 import isSameOrAfter = require("dayjs/plugin/isSameOrAfter");
 import isSameOrBefore = require("dayjs/plugin/isSameOrBefore");
-import { sendDiscord } from "./notification";
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
+
+let today = dayjs().format("DD/MM/YYYY");
 
 type Transaction = {
   PCTime: string;
   tranDate: string;
   // Add other properties relevant to your transactions
 };
-
-const secondsThreshold = 300;
 
 function formatNumberToSixDigits(PCTime: string): string {
   if (PCTime) {
@@ -41,13 +40,13 @@ function getNowMinusSeconds(seconds: number): dayjs.Dayjs {
 
 // do a post axios to VCB API using async/await
 // fetch the data
-async function getTodayTrans(): Promise<any> {
+export async function getTodayTrans(): Promise<any> {
   const data = {
     username: process.env.VCB_USERNAME,
     password: process.env.VCB_PASSWORD,
     accountNumber: process.env.VCB_ACCOUNT_NUMBER,
-    begin: "20/06/2023",
-    end: "20/06/2023",
+    begin: today,
+    end: today,
   };
   const config = {
     method: "post",
@@ -68,7 +67,7 @@ async function getTodayTrans(): Promise<any> {
   return transactions;
 }
 
-async function checkNewTrans(
+export async function checkNewTrans(
   getTransactions: () => Promise<Transaction[]>,
   secondsThreshold: number
 ): Promise<Transaction[]> {
@@ -88,17 +87,3 @@ async function checkNewTrans(
 
   return newTransactions;
 }
-
-checkNewTrans(getTodayTrans, secondsThreshold)
-  .then((newTransactions) => {
-    if (newTransactions.length === 0) {
-      console.log("No new transactions.");
-      return;
-    }
-    console.log(`There are ${newTransactions.length} new transactions.`);
-    console.log("New Transactions:", JSON.stringify(newTransactions));
-    // sendDiscord("hi test");
-  })
-  .catch((error) => {
-    console.error("Error:", error);
-  });

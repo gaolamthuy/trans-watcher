@@ -1,0 +1,40 @@
+name: SSH Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            # Remove the old .env file if it exists
+            sudo rm -f ~/vcb-trans-watchdog/.env
+
+            # Create a new .env file with secrets
+            sudo echo "VCB_API_URL=${{ secrets.VCB_API_URL }}" >> ~/vcb-trans-watchdog/.env
+            sudo echo "VCB_USERNAME=${{ secrets.VCB_USERNAME }}" >> ~/vcb-trans-watchdog/.env
+            sudo echo "VCB_PASSWORD=${{ secrets.VCB_PASSWORD }}" >> ~/vcb-trans-watchdog/.env
+            sudo echo "VCB_ACCOUNT_NUMBER=${{ secrets.VCB_ACCOUNT_NUMBER }}" >> ~/vcb-trans-watchdog/.env
+            sudo echo "DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}" >> ~/vcb-trans-watchdog/.env
+
+            # Add any additional deployment commands
+            sduo echo "Deploying via SSH..."
+            cd ~/vcb-trans-watchdog
+            sudo git pull origin main
+            # Add any additional commands for deployment
+            sudo docker image prune
+            sudo docker-compose up -d --no-deps --build
