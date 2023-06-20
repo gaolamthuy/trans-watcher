@@ -1,7 +1,6 @@
 version: "3"
 services:
-  vcb-trans-watchdog:
-    container_name: vcb-trans-watchdog
+  app:
     build:
       context: .
       dockerfile: Dockerfile
