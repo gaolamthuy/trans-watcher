@@ -8,11 +8,16 @@ dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
 
-let today = dayjs().format("DD/MM/YYYY");
+export function today() {
+  return dayjs().format("DD/MM/YYYY");
+}
+
+export function timeStamp() {
+  return dayjs().format("ddd, DD/MM/YYYY HH:mm:ss");
+}
 
 type Transaction = {
   PCTime: string;
-  tranDate: string;
   // Add other properties relevant to your transactions
 };
 
@@ -23,19 +28,20 @@ export function formatNumberToSixDigits(PCTime: string): string {
   return "";
 }
 
-export function getTransTimeAsDayjs(
-  dateString: string,
-  timeString: string
-): dayjs.Dayjs {
-  const formattedDateTime = `${dateString} ${timeString}`;
-  const dayjsObject = dayjs(formattedDateTime, "DD/MM/YYYY HHmmss");
-  return dayjsObject;
+export function getTransTimeAsDayjs(timeString: string): dayjs.Dayjs {
+  const formattedDateTime = `${today()} ${timeString}`;
+  const transDayjsObject = dayjs(formattedDateTime, "DD/MM/YYYY HHmmss");
+  // console.log(
+  //   "transDayjsObject: ",
+  //   transDayjsObject.format("DD/MM/YYYY HH:mm:ss")
+  // );
+  return transDayjsObject;
 }
 
 function getNowMinusSeconds(seconds: number): dayjs.Dayjs {
-  const now = dayjs();
-  const subtractedTime = now.subtract(seconds, "second");
-  return subtractedTime;
+  let minusNow = dayjs().subtract(seconds, "second");
+  // console.log("minusNow: ", minusNow.format("DD/MM/YYYY HH:mm:ss"));
+  return minusNow;
 }
 
 // do a post axios to VCB API using async/await
@@ -45,8 +51,8 @@ export async function getTodayTrans(): Promise<any> {
     username: process.env.VCB_USERNAME,
     password: process.env.VCB_PASSWORD,
     accountNumber: process.env.VCB_ACCOUNT_NUMBER,
-    begin: today,
-    end: today,
+    begin: today(),
+    end: today(),
   };
   const config = {
     method: "post",
@@ -68,22 +74,24 @@ export async function getTodayTrans(): Promise<any> {
 }
 
 export async function checkNewTrans(
-  getTransactions: () => Promise<Transaction[]>,
   secondsThreshold: number
 ): Promise<Transaction[]> {
-  const transactions = await getTransactions();
+  const transactions = await getTodayTrans();
   const nowMinus = getNowMinusSeconds(secondsThreshold);
 
-  const newTransactions = transactions.filter((transaction) => {
-    const transactionDate = transaction.tranDate;
+  const newTransactions = transactions.filter((transaction: any) => {
     const transactionTime = formatNumberToSixDigits(transaction.PCTime);
-    const transTime = getTransTimeAsDayjs(transactionDate, transactionTime);
-    // console.log("transTime: ", transTime.format("DD/MM/YY HH:mm:ss"));
+    const transDayjsObject = getTransTimeAsDayjs(transactionTime);
     // console.log("now: ", nowMinus.format("DD/MM/YY HH:mm:ss"));
     return (
-      transTime.isSameOrAfter(nowMinus) && transTime.isSameOrBefore(dayjs())
+      transDayjsObject.isSameOrAfter(nowMinus) &&
+      transDayjsObject.isSameOrBefore(dayjs())
     );
   });
 
   return newTransactions;
 }
+
+// checkNewTrans(30).then((newTransactions) => {
+//   console.log("newTransactions", newTransactions);
+// });

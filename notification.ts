@@ -1,6 +1,7 @@
 import axios from "axios";
-import { formatNumberToSixDigits } from "./checkNewTrans";
+import { formatNumberToSixDigits, timeStamp } from "./checkNewTrans";
 import dayjs from "dayjs";
+import "dotenv/config";
 
 export async function sendDiscord(
   amount: string,
@@ -11,39 +12,27 @@ export async function sendDiscord(
 
   const payload = {
     username: "Nhận chuyển khoản VCB",
+    avatar_url:
+      "https://raw.githubusercontent.com/hophamlam/vcb-trans-watchdog/main/assets/logo_vcb_1610091313.jpg",
     content: "Báo nhận chuyển khoản Vietcombank Hồ Phạm Lâm 1012 842 851",
+    color: "108500",
     embeds: [
       {
         title: "Nhận " + amount + " VNĐ",
-        description: description,
-        color: "0a9400",
         fields: [
           {
-            name: "Time",
-            value: time,
-            inline: true,
+            name: time,
+            value: description,
           },
         ],
       },
     ],
   };
 
-  console.log("- Sending message to Discord:", payload);
+  console.log(timeStamp(), " - Sending message to Discord:", payload);
   return axios.post(webhookUrl!, payload);
 }
 
 // Example usage
-const newTransactions: any = [
-  {
-    Amount: "10.5",
-    Description: "New purchase",
-    PCTime: "12:34:56",
-    tranDate: "01/01/2021",
-  },
-  {
-    Amount: "20.0",
-    Description: "Payment received",
-    PCTime: "23:45:00",
-    tranDate: "01/01/2021",
-  },
-];
+// sendDiscord("1000000", "2021-01-01 120000", "Test message");
+// sendDiscord();
