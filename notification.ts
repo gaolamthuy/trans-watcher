@@ -20,12 +20,12 @@ export async function sendDiscord(
     avatar_url:
       "https://raw.githubusercontent.com/hophamlam/vcb-trans-watchdog/main/assets/logo_vcb_1610091313.jpg",
     content: "Nhận " + amount + " VNĐ",
-    color: "46848",
+    color: "4621320",
     embeds: [
       {
         author: {
           name: "Hồ Phạm Lâm - VCB - 1012.842.851",
-          url: "https://lsgd.gaolamthuy.vn",
+          url: process.env.LSGD_URL,
           icon_url:
             "https://raw.githubusercontent.com/hophamlam/vcb-trans-watchdog/main/assets/logo_vcb_1610091313.jpg",
         },

@@ -30,6 +30,8 @@ jobs:
             echo "VCB_PASSWORD=${{ secrets.VCB_PASSWORD }}" | sudo tee -a ~/vcb-trans-watchdog/.env
             echo "VCB_ACCOUNT_NUMBER=${{ secrets.VCB_ACCOUNT_NUMBER }}" | sudo tee -a ~/vcb-trans-watchdog/.env
             echo "DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}" | sudo tee -a ~/vcb-trans-watchdog/.env
+            echo "LSGD_URL=${{ secrets.LSGD_URL }}" | sudo tee -a ~/vcb-trans-watchdog/.env
+
 
             # Add any additional deployment commands
             sudo echo "Deploying via SSH..."
