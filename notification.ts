@@ -19,7 +19,7 @@ export async function sendDiscord(
     username: "Nhận chuyển khoản VCB 1012.842.851",
     avatar_url:
       "https://raw.githubusercontent.com/hophamlam/vcb-trans-watchdog/main/assets/logo_vcb_1610091313.jpg",
-    content: "VCB-1012.842.851 nhận " + amount + " VNĐ",
+    content: "Nhận " + amount + " VNĐ",
     color: "46848",
     embeds: [
       {

@@ -8,7 +8,7 @@ dayjs.locale("vi");
 import { timeStamp } from "./checkNewTrans";
 
 // setup how many seconds to do the cron check
-const secondsThreshold = 30;
+const secondsThreshold = 15;
 const cronSyntax = `*/${secondsThreshold} * * * * *`;
 
 console.log(
