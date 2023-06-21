@@ -3,6 +3,11 @@ import { formatNumberToSixDigits, timeStamp } from "./checkNewTrans";
 import dayjs from "dayjs";
 import "dotenv/config";
 
+const capitalize = (str: any, lower = false) =>
+  (lower ? str.toLowerCase() : str).replace(
+    /(?:^|\s|["'([{])+\S/g,
+    (match: any) => match.toUpperCase()
+  );
 export async function sendDiscord(
   amount: string,
   time: string,
@@ -27,7 +32,7 @@ export async function sendDiscord(
         title: "Nhận " + amount + " VNĐ",
         fields: [
           {
-            name: time,
+            name: capitalize(time),
             value: description,
           },
         ],
@@ -44,5 +49,5 @@ export async function sendDiscord(
 }
 
 // Example usage
-// sendDiscord("1000000", "2021-01-01 120000", "Test message");
+// sendDiscord("1000000", "thứ tư, 21/06/2023 13:02:40", "Test message");
 // sendDiscord();
