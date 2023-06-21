@@ -5,7 +5,7 @@ import { formatNumberToSixDigits, getTransTimeAsDayjs } from "./checkNewTrans";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 dayjs.locale("vi");
-import { timeStamp, today } from "./checkNewTrans";
+import { timeStamp } from "./checkNewTrans";
 
 // setup how many seconds to do the cron check
 const secondsThreshold = 30;
@@ -47,10 +47,14 @@ const job = Cron(cronSyntax, () => {
           );
           sendDiscord(amount, time, description)
             .then((response) => {
-              console.log("Notification sent to Discord");
+              console.log(timeStamp(), "- Notification sent to Discord");
             })
             .catch((error) => {
-              console.error("Error sending notification:", error);
+              console.error(
+                timeStamp(),
+                "- Error sending notification:",
+                error
+              );
             });
         }
       }

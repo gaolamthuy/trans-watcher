@@ -1,8 +1,8 @@
 import axios from "axios";
-import { formatNumberToSixDigits, timeStamp } from "./checkNewTrans";
-import dayjs from "dayjs";
+import { timeStamp } from "./checkNewTrans";
 import "dotenv/config";
 
+// capitalize dayjs string
 const capitalize = (str: any, lower = false) =>
   (lower ? str.toLowerCase() : str).replace(
     /(?:^|\s|["'([{])+\S/g,
