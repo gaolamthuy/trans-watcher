@@ -22,7 +22,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             # Remove the old .env file if it exists
-            # sudo rm -f ~/vcb-trans-watchdog/.env
+            sudo rm -f ~/vcb-trans-watchdog/.env
 
             # Create a new .env file with secrets
             echo "VCB_API_URL=${{ secrets.VCB_API_URL }}" | sudo tee -a ~/vcb-trans-watchdog/.env
@@ -32,9 +32,10 @@ jobs:
             echo "DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}" | sudo tee -a ~/vcb-trans-watchdog/.env
 
             # Add any additional deployment commands
-            sduo echo "Deploying via SSH..."
+            sudo echo "Deploying via SSH..."
             cd ~/vcb-trans-watchdog
             sudo git pull origin main
+
             # Add any additional commands for deployment
             sudo docker image prune
             sudo docker-compose up -d --no-deps --build
