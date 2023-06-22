@@ -20,7 +20,6 @@ export async function sendDiscord(
     avatar_url:
       "https://raw.githubusercontent.com/hophamlam/vcb-trans-watchdog/main/assets/logo_vcb_1610091313.jpg",
     content: "Nhận " + amount + " VNĐ",
-    color: "4621320",
     embeds: [
       {
         author: {
@@ -30,6 +29,7 @@ export async function sendDiscord(
             "https://raw.githubusercontent.com/hophamlam/vcb-trans-watchdog/main/assets/logo_vcb_1610091313.jpg",
         },
         title: "Nhận " + amount + " VNĐ",
+        color: "5613637",
         fields: [
           {
             name: capitalize(time),
@@ -49,5 +49,4 @@ export async function sendDiscord(
 }
 
 // Example usage
-// sendDiscord("1000000", "thứ tư, 21/06/2023 13:02:40", "Test message");
-// sendDiscord();
+sendDiscord("1000000", "thứ tư, 21/06/2023 13:02:40", "Test message");
