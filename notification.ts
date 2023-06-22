@@ -49,4 +49,4 @@ export async function sendDiscord(
 }
 
 // Example usage
-// sendDiscord("1000000", "thứ tư, 21/06/2023 13:02:40", "Test message");
+// sendDiscord("test-amount", "test-date", "test-message");
