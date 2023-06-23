@@ -88,8 +88,7 @@ export async function getTodayTrans(): Promise<any> {
       retryCount++;
 
       if (retryCount === maxRetryCount) {
-        // sendDiscord("", "", "", true);
-        // throw error; // Optional: Rethrow the error to handle it in the caller function
+        sendDiscord("", "", "", true);
       } else {
         await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
       }
