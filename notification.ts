@@ -20,15 +20,15 @@ export async function sendDiscord(
 
   if (isServerDown) {
     payload = {
-      username: "Server is down",
-      content: "Server is down",
+      username: "Máy chủ VCB đang gặp sự cố",
+      content: "Máy chủ VCB đang gặp sự cố",
       embeds: [
         {
           author: {
-            name: "Server is down",
+            name: "Máy chủ VCB đang gặp sự cố",
           },
-          title: "Server is down",
-          color: "ff0000",
+          title: "Máy chủ VCB đang gặp sự cố",
+          color: "16711680",
         },
       ],
     };
@@ -69,4 +69,4 @@ export async function sendDiscord(
 }
 
 // Example usage
-// sendDiscord("test-amount", "test-date", "test-message");
+// sendDiscord("test-amount", "test-date", "test-message", true);

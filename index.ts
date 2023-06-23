@@ -60,7 +60,7 @@ const job = Cron(cronSyntax, () => {
       }
     })
     .catch((error) => {
-      console.error("Error:", error);
+      console.error("Error:", JSON.stringify(error));
       sendDiscord("", "", "", true);
       job.stop();
     });
