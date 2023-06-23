@@ -45,7 +45,7 @@ const job = Cron(cronSyntax, () => {
           const time = getTransTimeAsDayjs(formattedPCTime).format(
             "dddd, DD/MM/YYYY HH:mm:ss"
           );
-          sendDiscord(amount, time, description)
+          sendDiscord(amount, time, description, false)
             .then((response) => {
               console.log(timeStamp(), "- Notification sent to Discord");
             })
@@ -61,7 +61,7 @@ const job = Cron(cronSyntax, () => {
     })
     .catch((error) => {
       console.error("Error:", error);
-      sendDiscord("lỗi", "lỗi", "lỗi");
+      sendDiscord("", "", "", true);
       job.stop();
     });
 });
