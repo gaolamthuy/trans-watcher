@@ -21,7 +21,7 @@ export async function sendDiscord(
   if (isServerDown) {
     payload = {
       username: "Máy chủ VCB đang gặp sự cố",
-      content: "Máy chủ VCB đang gặp sự cố",
+      content: "Máy chủ VCB đang gặp sự cố" + timeStamp(),
       embeds: [
         {
           author: {
@@ -29,6 +29,11 @@ export async function sendDiscord(
           },
           title: "Máy chủ VCB đang gặp sự cố",
           color: "16711680",
+          fields: [
+            {
+              name: timeStamp(),
+            },
+          ],
         },
       ],
     };
