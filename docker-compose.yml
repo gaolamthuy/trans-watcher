@@ -6,3 +6,4 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: on-failure
+    network_mode: host
