@@ -22,20 +22,19 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             # Remove the old .env file if it exists
-            sudo rm -f ~/github.event.repository.name/.env
+            sudo rm -f ~/${{ github.event.repository.name }}/.env
 
             # Create a new .env file with secrets
-            echo "VCB_API_URL=${{ secrets.VCB_API_URL }}" | sudo tee -a ~/github.event.repository.name/.env
-            echo "VCB_USERNAME=${{ secrets.VCB_USERNAME }}" | sudo tee -a ~/github.event.repository.name/.env
-            echo "VCB_PASSWORD=${{ secrets.VCB_PASSWORD }}" | sudo tee -a ~/github.event.repository.name/.env
-            echo "VCB_ACCOUNT_NUMBER=${{ secrets.VCB_ACCOUNT_NUMBER }}" | sudo tee -a ~/github.event.repository.name/.env
-            echo "DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}" | sudo tee -a ~/github.event.repository.name/.env
-            echo "LSGD_URL=${{ secrets.LSGD_URL }}" | sudo tee -a ~/github.event.repository.name/.env
-
+            echo "VCB_API_URL=${{ secrets.VCB_API_URL }}" | sudo tee -a ~/${{ github.event.repository.name }}/.env
+            echo "VCB_USERNAME=${{ secrets.VCB_USERNAME }}" | sudo tee -a ~/${{ github.event.repository.name }}/.env
+            echo "VCB_PASSWORD=${{ secrets.VCB_PASSWORD }}" | sudo tee -a ~/${{ github.event.repository.name }}/.env
+            echo "VCB_ACCOUNT_NUMBER=${{ secrets.VCB_ACCOUNT_NUMBER }}" | sudo tee -a ~/${{ github.event.repository.name }}/.env
+            echo "DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}" | sudo tee -a ~/${{ github.event.repository.name }}/.env
+            echo "LSGD_URL=${{ secrets.LSGD_URL }}" | sudo tee -a ~/${{ github.event.repository.name }}/.env
 
             # Add any additional deployment commands
             sudo echo "Deploying via SSH..."
-            cd ~/github.event.repository.name
+            cd ~/${{ github.event.repository.name }}
             sudo git pull origin main
 
             # Add any additional commands for deployment
