@@ -48,38 +48,52 @@ function getNowMinusSeconds(seconds: number): dayjs.Dayjs {
 // do a post axios to VCB API using async/await
 // fetch the data
 export async function getTodayTrans(): Promise<any> {
-  try {
-    const data = {
-      username: process.env.VCB_USERNAME,
-      password: process.env.VCB_PASSWORD,
-      accountNumber: process.env.VCB_ACCOUNT_NUMBER,
-      begin: today(),
-      end: today(),
-    };
-    const config = {
-      method: "post",
-      url: process.env.VCB_API_URL,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify(data),
-    };
+  const maxRetryCount = 4;
+  const retryDelayMs = 4000; // 4 seconds
+  let retryCount = 0;
 
-    const response = await axios(config);
-    let transactions = response.data.results;
+  while (retryCount < maxRetryCount) {
+    try {
+      const data = {
+        username: process.env.VCB_USERNAME,
+        password: process.env.VCB_PASSWORD,
+        accountNumber: process.env.VCB_ACCOUNT_NUMBER,
+        begin: today(),
+        end: today(),
+      };
+      const config = {
+        method: "post",
+        url: process.env.VCB_API_URL,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: JSON.stringify(data),
+      };
 
-    if (!Array.isArray(transactions)) {
-      // If transactions is not an array, wrap it in an array
-      transactions = [transactions];
+      const response = await axios(config);
+      let transactions = response.data.results;
+
+      if (!Array.isArray(transactions)) {
+        // If transactions is not an array, wrap it in an array
+        transactions = [transactions];
+      }
+
+      return transactions;
+    } catch (error) {
+      console.error(
+        timeStamp(),
+        "\nAn error occurred while fetching today's transactions:",
+        JSON.stringify(error)
+      );
+      retryCount++;
+
+      if (retryCount === maxRetryCount) {
+        // sendDiscord("", "", "", true);
+        // throw error; // Optional: Rethrow the error to handle it in the caller function
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+      }
     }
-
-    return transactions;
-  } catch (error) {
-    console.error(
-      "An error occurred while fetching today's transactions:",
-      error
-    );
-    // throw sendDiscord("lỗi", "lỗi", "lỗi"); // Optional: Rethrow the error to handle it in the caller function
   }
 }
 
