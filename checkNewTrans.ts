@@ -79,7 +79,7 @@ export async function getTodayTrans(): Promise<any> {
       "An error occurred while fetching today's transactions:",
       error
     );
-    throw sendDiscord("lỗi", "lỗi", "lỗi"); // Optional: Rethrow the error to handle it in the caller function
+    // throw sendDiscord("lỗi", "lỗi", "lỗi"); // Optional: Rethrow the error to handle it in the caller function
   }
 }
 
