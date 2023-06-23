@@ -4,6 +4,7 @@ import dayjs = require("dayjs");
 import customParseFormat = require("dayjs/plugin/customParseFormat");
 import isSameOrAfter = require("dayjs/plugin/isSameOrAfter");
 import isSameOrBefore = require("dayjs/plugin/isSameOrBefore");
+import { sendDiscord } from "./notification";
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
@@ -47,30 +48,39 @@ function getNowMinusSeconds(seconds: number): dayjs.Dayjs {
 // do a post axios to VCB API using async/await
 // fetch the data
 export async function getTodayTrans(): Promise<any> {
-  const data = {
-    username: process.env.VCB_USERNAME,
-    password: process.env.VCB_PASSWORD,
-    accountNumber: process.env.VCB_ACCOUNT_NUMBER,
-    begin: today(),
-    end: today(),
-  };
-  const config = {
-    method: "post",
-    url: process.env.VCB_API_URL,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    data: JSON.stringify(data),
-  };
+  try {
+    const data = {
+      username: process.env.VCB_USERNAME,
+      password: process.env.VCB_PASSWORD,
+      accountNumber: process.env.VCB_ACCOUNT_NUMBER,
+      begin: today(),
+      end: today(),
+    };
+    const config = {
+      method: "post",
+      url: process.env.VCB_API_URL,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify(data),
+    };
 
-  const response = await axios(config);
-  let transactions = response.data.results;
-  if (!Array.isArray(transactions)) {
-    // If transactions is not an array, wrap it in an array
-    transactions = [transactions];
+    const response = await axios(config);
+    let transactions = response.data.results;
+
+    if (!Array.isArray(transactions)) {
+      // If transactions is not an array, wrap it in an array
+      transactions = [transactions];
+    }
+
+    return transactions;
+  } catch (error) {
+    console.error(
+      "An error occurred while fetching today's transactions:",
+      error
+    );
+    throw sendDiscord("lỗi", "lỗi", "lỗi"); // Optional: Rethrow the error to handle it in the caller function
   }
-
-  return transactions;
 }
 
 export async function checkNewTrans(

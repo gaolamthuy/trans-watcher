@@ -61,5 +61,7 @@ const job = Cron(cronSyntax, () => {
     })
     .catch((error) => {
       console.error("Error:", error);
+      sendDiscord("lỗi", "lỗi", "lỗi");
+      job.stop();
     });
 });
