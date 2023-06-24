@@ -61,6 +61,7 @@ const job = Cron(cronSyntax, () => {
     })
     .catch((error) => {
       console.error(timeStamp(), " stopping cron job.");
+      sendDiscord("", "", "", true);
       job.stop();
     });
 });
