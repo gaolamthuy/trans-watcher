@@ -99,22 +99,23 @@ export async function getTodayTrans(): Promise<any> {
 export async function checkNewTrans(
   secondsThreshold: number
 ): Promise<Transaction[]> {
+  // logic: parse PCTime to number and compare with now
   const transactions = await getTodayTrans();
   const nowMinus = getNowMinusSeconds(secondsThreshold);
-
+  const nowMinusFormatted = parseInt(nowMinus.format("HHmmss"));
+  const nowFormateted = parseInt(dayjs().format("HHmmss"));
   const newTransactions = transactions.filter((transaction: any) => {
-    const transactionTime = formatNumberToSixDigits(transaction.PCTime);
-    const transDayjsObject = getTransTimeAsDayjs(transactionTime);
+    const pcTimeFormatted = parseInt(transaction.PCTime);
     // console.log("now: ", nowMinus.format("DD/MM/YY HH:mm:ss"));
     return (
-      transDayjsObject.isSameOrAfter(nowMinus) &&
-      transDayjsObject.isSameOrBefore(dayjs())
+      // (now-crontime) <= transactionPCTime < now
+      pcTimeFormatted >= nowMinusFormatted && pcTimeFormatted < nowFormateted
     );
   });
-
   return newTransactions;
 }
 
-// checkNewTrans(30).then((newTransactions) => {
+// Test usage
+// checkNewTrans(60).then((newTransactions) => {
 //   console.log("newTransactions", newTransactions);
 // });

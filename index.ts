@@ -1,5 +1,5 @@
 import { Cron } from "croner";
-import { checkNewTrans, getTodayTrans } from "./checkNewTrans";
+import { checkNewTrans } from "./checkNewTrans";
 import { sendDiscord } from "./notification";
 import { formatNumberToSixDigits, getTransTimeAsDayjs } from "./checkNewTrans";
 import dayjs from "dayjs";
