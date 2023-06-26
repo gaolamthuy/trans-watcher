@@ -16,9 +16,10 @@ console.log(
 );
 
 // Basic: Run a function at the interval defined by a cron expression
-const job = Cron(cronSyntax, () => {
-  checkNewTrans(secondsThreshold)
-    .then((newTransactions: any) => {
+const job = Cron(cronSyntax, async () => {
+  try {
+    for (let i = 0; i < 5; i++) {
+      const newTransactions: any = await checkNewTrans(secondsThreshold);
       if (newTransactions.length === 0) {
         console.log(
           timeStamp(),
@@ -26,42 +27,41 @@ const job = Cron(cronSyntax, () => {
         );
         return;
       }
-      {
-        console.log(
-          timeStamp(),
-          ` - There is(are) ${newTransactions.length} new transactions in ${secondsThreshold} seconds.`
-        );
-        console.log(
-          timeStamp(),
-          "- New Transactions:",
-          JSON.stringify(newTransactions)
-        );
-        // parse newTransactions to string
 
-        for (const transaction of newTransactions) {
-          const amount = transaction.Amount;
-          const description = transaction.Description;
-          const formattedPCTime = formatNumberToSixDigits(transaction.PCTime);
-          const time = getTransTimeAsDayjs(formattedPCTime).format(
-            "dddd, DD/MM/YYYY HH:mm:ss"
-          );
-          sendDiscord(amount, time, description, false)
-            .then((response) => {
-              console.log(timeStamp(), "- Notification sent to Discord");
-            })
-            .catch((error) => {
-              console.error(
-                timeStamp(),
-                "- Error sending notification:",
-                JSON.stringify(error)
-              );
-            });
-        }
+      console.log(
+        timeStamp(),
+        ` - There is(are) ${newTransactions.length} new transactions in ${secondsThreshold} seconds.`
+      );
+      console.log(
+        timeStamp(),
+        "- New Transactions:",
+        JSON.stringify(newTransactions)
+      );
+
+      // parse newTransactions to string
+      for (const transaction of newTransactions) {
+        const amount = transaction.Amount;
+        const description = transaction.Description;
+        const formattedPCTime = formatNumberToSixDigits(transaction.PCTime);
+        const time = getTransTimeAsDayjs(formattedPCTime).format(
+          "dddd, DD/MM/YYYY HH:mm:ss"
+        );
+
+        await sendDiscord(amount, time, description, false);
+        console.log(timeStamp(), "- Notification sent to Discord");
+
+        await delay(2000); // Delay for 2 seconds
       }
-    })
-    .catch((error) => {
-      console.error(timeStamp(), " stopping cron job.");
-      sendDiscord("", "", "", true);
-      job.stop();
-    });
+    }
+    // Stop the job after executing 5 times
+    job.stop();
+  } catch (error) {
+    console.error(timeStamp(), " stopping cron job.");
+    sendDiscord("", "", "", true);
+    job.stop();
+  }
 });
+
+function delay(ms: any) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
