@@ -56,9 +56,9 @@ const job = Cron(cronSyntax, async () => {
     // Stop the job after executing 5 times
     job.stop();
   } catch (error) {
-    console.error(timeStamp(), " stopping cron job.");
+    console.error(timeStamp(), " - Stopping cron job. Error: ", error);
     sendDiscord("", "", "", true);
-    job.stop();
+    // job.stop();
   }
 });
 
