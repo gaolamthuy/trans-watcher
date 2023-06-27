@@ -70,9 +70,9 @@ export async function sendDiscord(
 }
 
 // Example usage
-// sendDiscord(
-//   "155,000",
-//   "CN, 25/06/2023 11:03:45",
-//   "MBVCB.3745800043.10kg Thai.CT tu 0071001223982 DOAN HONG HAI NGOC KIM NGAN toi1012842851 HO PHAM LAM",
-//   false
-// );
+sendDiscord(
+  "2,363,000",
+  "Thứ Ba, 27/06/2023 12:13:39",
+  "112724.270623.121338.IBFT Tien nep ngay 27 6",
+  false
+);

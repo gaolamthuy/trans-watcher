@@ -2,18 +2,15 @@ import "dotenv/config";
 import axios from "axios";
 import dayjs = require("dayjs");
 import customParseFormat = require("dayjs/plugin/customParseFormat");
-import isSameOrAfter = require("dayjs/plugin/isSameOrAfter");
-import isSameOrBefore = require("dayjs/plugin/isSameOrBefore");
 import { sendDiscord } from "./notification";
+import { job } from "./index";
 dayjs.extend(customParseFormat);
-dayjs.extend(isSameOrAfter);
-dayjs.extend(isSameOrBefore);
 
 export function today() {
   return dayjs().format("DD/MM/YYYY");
 }
 
-export function timeStamp() {
+export function timeStamp(): string {
   return dayjs().format("ddd, DD/MM/YYYY HH:mm:ss");
 }
 
@@ -49,7 +46,7 @@ function getNowMinusSeconds(seconds: number): dayjs.Dayjs {
 // fetch the data
 export async function getTodayTrans(): Promise<any> {
   const maxRetryCount = 4;
-  const retryDelayMs = 4000; // 4 seconds
+  const retryDelayMs = 1000; // 1 second
   let retryCount = 0;
 
   while (retryCount < maxRetryCount) {
@@ -94,6 +91,9 @@ export async function getTodayTrans(): Promise<any> {
       }
     }
   }
+
+  // If all retries fail, you may want to return an empty array or throw an error
+  // job.stop();
 }
 
 export async function checkNewTrans(
