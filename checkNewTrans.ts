@@ -3,7 +3,6 @@ import axios from "axios";
 import dayjs = require("dayjs");
 import customParseFormat = require("dayjs/plugin/customParseFormat");
 import { sendDiscord } from "./notification";
-import { job } from "./index";
 dayjs.extend(customParseFormat);
 
 export function today() {

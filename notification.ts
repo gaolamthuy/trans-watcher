@@ -70,9 +70,9 @@ export async function sendDiscord(
 }
 
 // Example usage
-sendDiscord(
-  "2,363,000",
-  "Thứ Ba, 27/06/2023 12:13:39",
-  "112724.270623.121338.IBFT Tien nep ngay 27 6",
-  false
-);
+// sendDiscord(
+//   "2,363,000",
+//   "Thứ Ba, 27/06/2023 12:13:39",
+//   "112724.270623.121338.IBFT Tien nep ngay 27 6",
+//   false
+// );
