@@ -21,42 +21,36 @@ console.log(
 // Basic: Run a function at the interval defined by a cron expression
 export const job = Cron(cronSyntax, async () => {
   try {
-    for (let i = 0; i < 5; i++) {
-      const newTransactions: any[] = await checkNewTrans(secondsThreshold);
-      if (newTransactions.length === 0) {
-        console.log(
-          timeStamp(),
-          `- No new transactions in ${secondsThreshold} seconds.`
-        );
-        return;
-      }
-
+    const newTransactions: any[] = await checkNewTrans(secondsThreshold);
+    if (newTransactions.length === 0) {
       console.log(
         timeStamp(),
-        ` - There is(are) ${newTransactions.length} new transaction(s) in ${secondsThreshold} seconds.`
+        `- No new transactions in ${secondsThreshold} seconds.`
       );
-      console.log(
-        timeStamp(),
-        "- New Transactions:",
-        JSON.stringify(newTransactions)
-      );
-
-      // parse newTransactions to string
-      for (const transaction of newTransactions) {
-        const amount = transaction.Amount;
-        const description = transaction.Description;
-        const formattedPCTime = formatNumberToSixDigits(transaction.PCTime);
-        const time = getTransTimeAsDayjs(formattedPCTime).format(
-          "dddd, DD/MM/YYYY HH:mm:ss"
-        );
-        await sendDiscord(amount, time, description, false);
-        console.log(timeStamp(), "- Notification sent to Discord");
-
-        // await delay(2000); // Delay for 2 seconds
-      }
+      return;
     }
-    // Stop the job after executing 5 times
-    job.stop();
+
+    console.log(
+      timeStamp(),
+      ` - There is(are) ${newTransactions.length} new transaction(s) in ${secondsThreshold} seconds.`
+    );
+    console.log(
+      timeStamp(),
+      "- New Transactions:",
+      JSON.stringify(newTransactions)
+    );
+
+    // parse newTransactions to string
+    for (const transaction of newTransactions) {
+      const amount = transaction.Amount;
+      const description = transaction.Description;
+      const formattedPCTime = formatNumberToSixDigits(transaction.PCTime);
+      const time = getTransTimeAsDayjs(formattedPCTime).format(
+        "dddd, DD/MM/YYYY HH:mm:ss"
+      );
+      await sendDiscord(amount, time, description, false);
+      console.log(timeStamp(), "- Notification sent to Discord");
+    }
   } catch (error) {
     console.error(
       timeStamp(),
