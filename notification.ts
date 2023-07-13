@@ -14,7 +14,13 @@ export async function sendDiscord(
   description: string,
   isServerDown: boolean
 ): Promise<any> {
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  let webhookUrl: any;
+
+  if (isServerDown) {
+    webhookUrl = process.env.FAILSERVER_WEBHOOK_URL;
+  } else {
+    webhookUrl = process.env.TRANS_WEBHOOK_URL;
+  }
 
   let payload: any;
 

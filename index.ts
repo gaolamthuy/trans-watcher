@@ -57,7 +57,7 @@ export const job = Cron(cronSyntax, async () => {
       " - Stopping cron job. Error: ",
       JSON.stringify(error)
     );
-    // job.stop();
+    sendDiscord("", "", "", true);
   }
 });
 
