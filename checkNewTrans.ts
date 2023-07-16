@@ -122,7 +122,7 @@ export async function checkNewTrans() {
         timeStamp(),
         "- Initial lastReference set to:",
         lastReference,
-        " ",
+        "- lastRemark:",
         lastRemark
       );
       return;
@@ -136,7 +136,7 @@ export async function checkNewTrans() {
         timeStamp(),
         "- Last reference not found in new transactions:",
         lastReference,
-        "",
+        "- lastRemark:",
         lastRemark
       );
       return;
@@ -159,7 +159,7 @@ export async function checkNewTrans() {
       timeStamp(),
       "- lastReference updated to:",
       lastReference,
-      "",
+      "- lastRemark:",
       lastRemark
     );
   } catch (error) {
