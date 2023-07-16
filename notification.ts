@@ -8,38 +8,24 @@ const capitalize = (str: any, lower = false) =>
     /(?:^|\s|["'([{])+\S/g,
     (match: any) => match.toUpperCase()
   );
+
 export async function sendDiscord(
   amount: string,
   time: string,
   description: string,
-  isServerDown: boolean
+  messageType: "transaction" | "system"
 ): Promise<any> {
   let webhookUrl: any;
 
-  if (isServerDown) {
-    webhookUrl = process.env.FAILSERVER_WEBHOOK_URL;
-  } else {
+  if (messageType === "transaction") {
     webhookUrl = process.env.TRANS_WEBHOOK_URL;
+  } else {
+    webhookUrl = process.env.SYSTEM_WEBHOOK_URL;
   }
 
   let payload: any;
 
-  if (isServerDown) {
-    payload = {
-      embeds: [
-        {
-          title: "Máy chủ VCB đang gặp sự cố",
-          color: "16711680",
-          fields: [
-            {
-              name: "Máy chủ VCB đang gặp sự cố",
-              value: timeStamp(),
-            },
-          ],
-        },
-      ],
-    };
-  } else {
+  if (messageType === "transaction") {
     payload = {
       username: "Nhận chuyển khoản VCB 1012.842.851",
       avatar_url:
@@ -64,6 +50,21 @@ export async function sendDiscord(
         },
       ],
     };
+  } else {
+    payload = {
+      embeds: [
+        {
+          title: "Máy chủ VCB đang gặp sự cố",
+          color: "16711680",
+          fields: [
+            {
+              name: "Máy chủ VCB đang gặp sự cố",
+              value: timeStamp(),
+            },
+          ],
+        },
+      ],
+    };
   }
 
   console.log(
@@ -76,9 +77,9 @@ export async function sendDiscord(
 }
 
 // Example usage
-// sendDiscord(
-//   "2,363,000",
-//   "Thứ Ba, 27/06/2023 12:13:39",
-//   "112724.270623.121338.IBFT Tien nep ngay 27 6",
-//   false
-// );
+sendDiscord(
+  "2,363,000",
+  "Thứ Bảy, 15/07/2023 09:19:06",
+  "928941.150723.091905.IBFT NGUYEN THI MY HANH chuyen tien",
+  "transaction"
+);

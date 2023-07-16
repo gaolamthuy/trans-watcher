@@ -30,7 +30,7 @@ jobs:
             echo "VCB_PASSWORD=${{ secrets.VCB_PASSWORD }}" | sudo tee -a ~/${{ github.event.repository.name }}/.env
             echo "VCB_ACCOUNT_NUMBER=${{ secrets.VCB_ACCOUNT_NUMBER }}" | sudo tee -a ~/${{ github.event.repository.name }}/.env
             echo "TRANS_WEBHOOK_URL=${{ secrets.TRANS_WEBHOOK_URL }}" | sudo tee -a ~/${{ github.event.repository.name }}/.env
-            echo "FAILSERVER_WEBHOOK_URL=${{ secrets.FAILSERVER_WEBHOOK_URL }}" | sudo tee -a ~/${{ github.event.repository.name }}/.env
+            echo "SYSTEM_WEBHOOK_URL=${{ secrets.SYSTEM_WEBHOOK_URL }}" | sudo tee -a ~/${{ github.event.repository.name }}/.env
             echo "LSGD_URL=${{ secrets.LSGD_URL }}" | sudo tee -a ~/${{ github.event.repository.name }}/.env
 
             # Add any additional deployment commands
