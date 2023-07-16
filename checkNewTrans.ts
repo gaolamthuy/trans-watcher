@@ -100,44 +100,72 @@ export async function getTodayTrans(): Promise<any> {
 }
 
 // Store last timestamp and look for new transactions
-let lastReference = "5189 - 4171";
+let lastReference = "";
+let lastRemark = "";
 let newTransactions = [];
 
-async function checkNewTrans() {
-  const transactions = await getTodayTrans();
+export async function checkNewTrans() {
+  try {
+    const transactions = await getTodayTrans();
 
-  if (transactions.length === 0) {
-    console.log("No transactions found.");
-    return;
-  }
+    if (transactions.length === 0) {
+      console.log(timeStamp(), "- No transactions found.");
+      return;
+    }
 
-  const latestTransaction = transactions[0]; // Assuming the latest transaction is at index 0
+    const latestTransaction = transactions[0]; // Assuming the latest transaction is at index 0
 
-  if (lastReference === "") {
+    if (lastReference === "") {
+      lastReference = latestTransaction.Reference;
+      lastRemark = latestTransaction.Remark;
+      console.log(
+        timeStamp(),
+        "- Initial lastReference set to:",
+        lastReference,
+        " ",
+        lastRemark
+      );
+      return;
+    }
+
+    const index = transactions.findIndex(
+      (trans: any) => trans.Reference === lastReference
+    );
+    if (index === -1) {
+      console.log(
+        timeStamp(),
+        "- Last reference not found in new transactions:",
+        lastReference,
+        "",
+        lastRemark
+      );
+      return;
+    }
+
+    newTransactions = transactions.slice(0, index);
+
+    if (newTransactions.length === 0) {
+      // console.log(timeStamp(), "- No new transactions found.");
+    } else {
+      newTransactions.forEach((transaction: any) => {
+        console.log(timeStamp(), "- Transaction:", JSON.stringify(transaction));
+        // Perform desired actions with the new transaction
+      });
+    }
+
+    // Update lastReference to the latest transaction's Reference
     lastReference = latestTransaction.Reference;
-    console.log("Initial lastReference set to:", lastReference);
-    return;
+    console.log(
+      timeStamp(),
+      "- lastReference updated to:",
+      lastReference,
+      "",
+      lastRemark
+    );
+  } catch (error) {
+    console.error(timeStamp(), "- Error: ", JSON.stringify(error));
+    await sendDiscord("", "", "", "system");
   }
-
-  const index = transactions.findIndex(
-    (trans: any) => trans.Reference === lastReference
-  );
-  if (index === -1) {
-    console.log("Last reference not found in new transactions:", lastReference);
-    return;
-  }
-
-  newTransactions = transactions.slice(0, index);
-
-  console.log("New transactions found:");
-  newTransactions.forEach((transaction: any) => {
-    console.log("Transaction:", transaction);
-    // Perform desired actions with the new transaction
-  });
-
-  // Update lastReference to the latest transaction's Reference
-  lastReference = latestTransaction.Reference;
-  console.log("lastReference updated to:", lastReference);
 }
 
 async function testCheckNewTrans() {
