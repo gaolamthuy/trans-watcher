@@ -77,9 +77,9 @@ export async function sendDiscord(
 }
 
 // Example usage
-sendDiscord(
-  "2,363,000",
-  "Thứ Bảy, 15/07/2023 09:19:06",
-  "928941.150723.091905.IBFT NGUYEN THI MY HANH chuyen tien",
-  "transaction"
-);
+// sendDiscord(
+//   "200,000",
+//   "Thứ Ba, 18/07/2023 18:10:19",
+//   "437393.180723.181019.Luong Cong Hung Chuyen tien",
+//   "transaction"
+// );
