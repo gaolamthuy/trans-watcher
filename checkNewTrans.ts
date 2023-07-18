@@ -149,12 +149,21 @@ export async function checkNewTrans() {
     } else {
       newTransactions.forEach((transaction: any) => {
         console.log(timeStamp(), "- Transaction:", JSON.stringify(transaction));
+        sendDiscord(
+          transaction.Amount,
+          getTransTimeAsDayjs(
+            formatNumberToSixDigits(transaction.PCTime)
+          ).format("dddd, DD/MM/YYYY HH:mm:ss"),
+          transaction.Remark,
+          "transaction"
+        );
         // Perform desired actions with the new transaction
       });
     }
 
     // Update lastReference to the latest transaction's Reference
     lastReference = latestTransaction.Reference;
+    lastRemark = latestTransaction.Remark;
     console.log(
       timeStamp(),
       "- lastReference updated to:",

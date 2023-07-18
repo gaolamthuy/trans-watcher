@@ -39,12 +39,12 @@ export async function sendDiscord(
             icon_url:
               "https://raw.githubusercontent.com/hophamlam/vcb-trans-watchdog/main/assets/logo_vcb_1610091313.jpg",
           },
-          title: "Nhận " + amount + " VNĐ",
+          title: "💵 " + amount + " VNĐ",
           color: "5613637",
           fields: [
             {
-              name: capitalize(time),
-              value: description,
+              name: "⏲️ " + capitalize(time),
+              value: "🗎 " + description,
             },
           ],
         },
@@ -77,9 +77,9 @@ export async function sendDiscord(
 }
 
 // Example usage
-// sendDiscord(
-//   "2,363,000",
-//   "Thứ Bảy, 15/07/2023 09:19:06",
-//   "928941.150723.091905.IBFT NGUYEN THI MY HANH chuyen tien",
-//   "transaction"
-// );
+sendDiscord(
+  "2,363,000",
+  "Thứ Bảy, 15/07/2023 09:19:06",
+  "928941.150723.091905.IBFT NGUYEN THI MY HANH chuyen tien",
+  "transaction"
+);
