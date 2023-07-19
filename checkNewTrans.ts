@@ -100,9 +100,12 @@ export async function getTodayTrans(): Promise<any> {
 }
 
 // Store last timestamp and look for new transactions
-let lastReference = "";
-let lastRemark = "";
-let newTransactions = [];
+let latestTransaction = JSON.stringify({
+  reference: "",
+  remark: "",
+  amount: "",
+  // Additional variables can be added here
+});
 
 export async function checkNewTrans() {
   try {
@@ -113,63 +116,96 @@ export async function checkNewTrans() {
       return;
     }
 
-    const latestTransaction = transactions[0]; // Assuming the latest transaction is at index 0
+    const currentLatestTransaction = transactions[0];
+    const parsedLatestTransaction = JSON.parse(latestTransaction);
 
-    if (lastReference === "") {
-      lastReference = latestTransaction.Reference;
-      lastRemark = latestTransaction.Remark;
+    if (parsedLatestTransaction.reference === "") {
+      parsedLatestTransaction.reference = currentLatestTransaction.Reference;
+      parsedLatestTransaction.remark = currentLatestTransaction.Remark;
+      parsedLatestTransaction.amount = currentLatestTransaction.Amount;
+
+      latestTransaction = JSON.stringify(parsedLatestTransaction);
+
       console.log(
         timeStamp(),
         "- Initial lastReference set to:",
-        lastReference,
+        parsedLatestTransaction.reference,
         "- lastRemark:",
-        lastRemark
+        parsedLatestTransaction.remark,
+        "- lastAmount:",
+        parsedLatestTransaction.amount
       );
+
       return;
     }
 
     const index = transactions.findIndex(
-      (trans: any) => trans.Reference === lastReference
+      (trans: { Reference: string }) =>
+        trans.Reference === parsedLatestTransaction.reference
     );
+
     if (index === -1) {
       console.log(
         timeStamp(),
         "- Last reference not found in new transactions:",
-        lastReference,
+        parsedLatestTransaction.reference,
         "- lastRemark:",
-        lastRemark
+        parsedLatestTransaction.remark,
+        "- lastAmount:",
+        parsedLatestTransaction.amount
       );
+
       return;
     }
 
-    newTransactions = transactions.slice(0, index);
+    const newTransactions = transactions.slice(0, index);
 
     if (newTransactions.length === 0) {
       // console.log(timeStamp(), "- No new transactions found.");
     } else {
-      newTransactions.forEach((transaction: any) => {
-        console.log(timeStamp(), "- Transaction:", JSON.stringify(transaction));
-        sendDiscord(
-          transaction.Amount,
-          getTransTimeAsDayjs(
-            formatNumberToSixDigits(transaction.PCTime)
-          ).format("dddd, DD/MM/YYYY HH:mm:ss"),
-          transaction.Remark,
-          "transaction"
-        );
-        // Perform desired actions with the new transaction
-      });
+      newTransactions.forEach(
+        ({
+          Amount,
+          PCTime,
+          Remark,
+        }: {
+          Amount: string;
+          PCTime: string;
+          Remark: string;
+        }) => {
+          console.log(
+            timeStamp(),
+            "- Transaction:",
+            JSON.stringify({ Amount, PCTime, Remark })
+          );
+          sendDiscord(
+            Amount,
+            getTransTimeAsDayjs(formatNumberToSixDigits(PCTime)).format(
+              "dddd, DD/MM/YYYY HH:mm:ss"
+            ),
+            Remark,
+            "transaction"
+          );
+          // Perform desired actions with the new transaction
+        }
+      );
     }
 
-    // Update lastReference to the latest transaction's Reference
-    lastReference = latestTransaction.Reference;
-    lastRemark = latestTransaction.Remark;
+    // Update latestTransaction information
+    parsedLatestTransaction.reference = currentLatestTransaction.Reference;
+    parsedLatestTransaction.remark = currentLatestTransaction.Remark;
+    parsedLatestTransaction.amount = currentLatestTransaction.Amount;
+
+    latestTransaction = JSON.stringify(parsedLatestTransaction);
+
     console.log(
       timeStamp(),
       "- lastReference updated to:",
-      lastReference,
+      parsedLatestTransaction.reference,
       "- lastRemark:",
-      lastRemark
+      parsedLatestTransaction.remark,
+      "- lastAmount:",
+      parsedLatestTransaction.amount
     );
   } catch (error) {
     console.error(timeStamp(), "- Error: ", JSON.stringify(error));
