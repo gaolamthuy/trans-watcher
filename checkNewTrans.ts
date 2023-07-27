@@ -163,6 +163,7 @@ export async function checkNewTrans() {
     if (newTransactions.length === 0) {
       // console.log(timeStamp(), "- No new transactions found.");
     } else {
+      console.log(timeStamp(), "- New transactions found:");
       newTransactions.forEach(
         ({
           Amount,
