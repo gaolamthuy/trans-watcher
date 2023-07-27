@@ -37,7 +37,7 @@ jobs:
             sudo echo "Deploying via SSH..."
             # cd ~/${{ github.event.repository.name }}
             # sudo git pull origin main
-            if cd ${{ github.event.repository.name }}; then git pull; else git clone https://github.com/${{github.repository}}.git" ${{ github.event.repository.name }}; fi
+            # if cd ${{ github.event.repository.name }}; then git pull; else git clone https://github.com/${{github.repository}}.git" ${{ github.event.repository.name }}; fi
 
             # Add any additional commands for deployment
             sudo docker system prune -f
