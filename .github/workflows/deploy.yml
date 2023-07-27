@@ -39,7 +39,10 @@ jobs:
             # sudo git pull origin main
             # if cd ${{ github.event.repository.name }}; then git pull; else git clone https://github.com/${{github.repository}}.git" ${{ github.event.repository.name }}; fi
 
+            git -C '.${{ github.event.repository.name }}' pull || git clone https://github.com/${{github.repository}}.git '.${{ github.event.repository.name }}'
+
             # Add any additional commands for deployment
+            cd ~/${{ github.event.repository.name }}
             sudo docker system prune -f
             sudo docker image prune -a --force
             sudo docker-compose up -d --no-deps --build
