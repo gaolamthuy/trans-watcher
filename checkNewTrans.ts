@@ -186,27 +186,27 @@ export async function checkNewTrans() {
             Remark,
             "transaction"
           );
-          // Perform desired actions with the new transaction
+
+          // Update latestTransaction information
+          parsedLatestTransaction.reference =
+            currentLatestTransaction.Reference;
+          parsedLatestTransaction.remark = currentLatestTransaction.Remark;
+          parsedLatestTransaction.amount = currentLatestTransaction.Amount;
+
+          latestTransaction = JSON.stringify(parsedLatestTransaction);
+
+          console.log(
+            timeStamp(),
+            "- lastReference updated to:",
+            parsedLatestTransaction.reference,
+            "- lastRemark:",
+            parsedLatestTransaction.remark,
+            "- lastAmount:",
+            parsedLatestTransaction.amount
+          );
         }
       );
     }
-
-    // Update latestTransaction information
-    parsedLatestTransaction.reference = currentLatestTransaction.Reference;
-    parsedLatestTransaction.remark = currentLatestTransaction.Remark;
-    parsedLatestTransaction.amount = currentLatestTransaction.Amount;
-
-    latestTransaction = JSON.stringify(parsedLatestTransaction);
-
-    console.log(
-      timeStamp(),
-      "- lastReference updated to:",
-      parsedLatestTransaction.reference,
-      "- lastRemark:",
-      parsedLatestTransaction.remark,
-      "- lastAmount:",
-      parsedLatestTransaction.amount
-    );
   } catch (error) {
     console.error(timeStamp(), "- Error: ", JSON.stringify(error));
     await sendDiscord("", "", "", "system");

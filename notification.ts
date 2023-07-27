@@ -78,8 +78,8 @@ export async function sendDiscord(
 
 // Example usage
 // sendDiscord(
-//   "200,000",
-//   "Thứ Ba, 18/07/2023 18:10:19",
-//   "437393.180723.181019.Luong Cong Hung Chuyen tien",
+//   "145,000",
+//   "Thứ Năm, 27/07/2023 16:16:15",
+//   "646454.270723.161615.IBFT LE NGOC KIEU MY chuyen tien",
 //   "transaction"
 // );
