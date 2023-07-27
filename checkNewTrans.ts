@@ -10,7 +10,7 @@ export function today() {
 }
 
 function getThirtyDaysAgoDate() {
-  return dayjs().subtract(1, "month").format("DD/MM/YYYY");
+  return dayjs().subtract(29, "day").format("DD/MM/YYYY");
 }
 
 export function timeStamp(): string {

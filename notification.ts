@@ -29,7 +29,7 @@ export async function sendDiscord(
     payload = {
       username: "Nhận chuyển khoản VCB 1012.842.851",
       avatar_url:
-        "https://raw.githubusercontent.com/hophamlam/vcb-trans-watchdog/main/assets/logo_vcb_1610091313.jpg",
+        "https://raw.githubusercontent.com/hophamlam/trans-watchdog/main/assets/logo_vcb_1610091313.jpg",
       content: "Nhận " + amount + " VNĐ",
       embeds: [
         {
@@ -37,7 +37,7 @@ export async function sendDiscord(
             name: "Hồ Phạm Lâm - VCB - 1012.842.851",
             url: process.env.LSGD_URL,
             icon_url:
-              "https://raw.githubusercontent.com/hophamlam/vcb-trans-watchdog/main/assets/logo_vcb_1610091313.jpg",
+              "https://raw.githubusercontent.com/hophamlam/trans-watchdog/main/assets/logo_vcb_1610091313.jpg",
           },
           title: "💵 " + amount + " VNĐ",
           color: "5613637",
