@@ -2,12 +2,20 @@ import axios from "axios";
 import { timeStamp } from "./checkNewTrans";
 import "dotenv/config";
 
-// capitalize dayjs string
-const capitalize = (str: any, lower = false) =>
-  (lower ? str.toLowerCase() : str).replace(
+enum MessageTypes {
+  TRANSACTION = "transaction",
+  SYSTEM = "system",
+}
+
+const VCB_AVATAR_URL =
+  "https://raw.githubusercontent.com/hophamlam/trans-watchdog/main/assets/logo_vcb_1610091313.jpg";
+
+function capitalize(str: string, lower: boolean = false): string {
+  return (lower ? str.toLowerCase() : str).replace(
     /(?:^|\s|["'([{])+\S/g,
-    (match: any) => match.toUpperCase()
+    (match: string) => match.toUpperCase()
   );
+}
 
 export async function sendDiscord(
   amount: string,
@@ -15,57 +23,53 @@ export async function sendDiscord(
   description: string,
   messageType: "transaction" | "system"
 ): Promise<any> {
-  let webhookUrl: any;
+  const webhookUrl =
+    messageType === MessageTypes.TRANSACTION
+      ? process.env.TRANS_WEBHOOK_URL
+      : process.env.SYSTEM_WEBHOOK_URL;
 
-  if (messageType === "transaction") {
-    webhookUrl = process.env.TRANS_WEBHOOK_URL;
-  } else {
-    webhookUrl = process.env.SYSTEM_WEBHOOK_URL;
+  if (!webhookUrl) {
+    throw new Error("Webhook URL not provided for the message type.");
   }
 
-  let payload: any;
-
-  if (messageType === "transaction") {
-    payload = {
-      username: "Nhận chuyển khoản VCB 1012.842.851",
-      avatar_url:
-        "https://raw.githubusercontent.com/hophamlam/trans-watchdog/main/assets/logo_vcb_1610091313.jpg",
-      content: "Nhận " + amount + " VNĐ",
-      embeds: [
-        {
-          author: {
-            name: "Hồ Phạm Lâm - VCB - 1012.842.851",
-            url: process.env.LSGD_URL,
-            icon_url:
-              "https://raw.githubusercontent.com/hophamlam/trans-watchdog/main/assets/logo_vcb_1610091313.jpg",
-          },
-          title: "💵 " + amount + " VNĐ",
-          color: "5613637",
-          fields: [
+  const payload =
+    messageType === MessageTypes.TRANSACTION
+      ? {
+          username: "Nhận chuyển khoản VCB 1012.842.851",
+          avatar_url: VCB_AVATAR_URL,
+          content: `Nhận ${amount} VNĐ`,
+          embeds: [
             {
-              name: "⏲️ " + capitalize(time),
-              value: "🗎 " + description,
+              author: {
+                name: "Hồ Phạm Lâm - VCB - 1012.842.851",
+                url: process.env.LSGD_URL,
+                icon_url: VCB_AVATAR_URL,
+              },
+              title: `💵 ${amount} VNĐ`,
+              color: "5613637", // Consider using named constants for colors
+              fields: [
+                {
+                  name: `⏲️ ${capitalize(time)}`,
+                  value: `🗎 ${description}`,
+                },
+              ],
             },
           ],
-        },
-      ],
-    };
-  } else {
-    payload = {
-      embeds: [
-        {
-          title: "Máy chủ VCB đang gặp sự cố",
-          color: "16711680",
-          fields: [
+        }
+      : {
+          embeds: [
             {
-              name: "Máy chủ VCB đang gặp sự cố",
-              value: timeStamp(),
+              title: "Máy chủ VCB đang gặp sự cố",
+              color: "16711680", // Consider using named constants for colors
+              fields: [
+                {
+                  name: "Máy chủ VCB đang gặp sự cố",
+                  value: timeStamp(),
+                },
+              ],
             },
           ],
-        },
-      ],
-    };
-  }
+        };
 
   console.log(
     timeStamp(),
@@ -73,7 +77,12 @@ export async function sendDiscord(
     JSON.stringify(payload)
   );
 
-  return axios.post(webhookUrl!, payload);
+  try {
+    return await axios.post(webhookUrl, payload);
+  } catch (error: any) {
+    console.error("Error sending Discord notification:", error.message);
+    throw error;
+  }
 }
 
 // Example usage

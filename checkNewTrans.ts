@@ -128,11 +128,11 @@ export async function checkNewTrans() {
 
       console.log(
         timeStamp(),
-        "- Initial lastReference set to:",
+        "- Initial latestReference set to:",
         parsedLatestTransaction.reference,
-        "- lastRemark:",
+        "- latestRemark:",
         parsedLatestTransaction.remark,
-        "- lastAmount:",
+        "- latestAmount:",
         parsedLatestTransaction.amount
       );
 
@@ -147,11 +147,11 @@ export async function checkNewTrans() {
     if (index === -1) {
       console.log(
         timeStamp(),
-        "- Last reference not found in new transactions:",
+        "- Latest reference not found in new transactions:",
         parsedLatestTransaction.reference,
-        "- lastRemark:",
+        "- latestRemark:",
         parsedLatestTransaction.remark,
-        "- lastAmount:",
+        "- latestAmount:",
         parsedLatestTransaction.amount
       );
 
@@ -197,16 +197,26 @@ export async function checkNewTrans() {
 
           console.log(
             timeStamp(),
-            "- lastReference updated to:",
+            "- latestReference updated to:",
             parsedLatestTransaction.reference,
-            "- lastRemark:",
+            "- latestRemark:",
             parsedLatestTransaction.remark,
-            "- lastAmount:",
+            "- latestAmount:",
             parsedLatestTransaction.amount
           );
         }
       );
     }
+    // Log latestTransaction
+    console.log(
+      timeStamp(),
+      "- Current latestReference:",
+      parsedLatestTransaction.reference,
+      "- latestRemark:",
+      parsedLatestTransaction.remark,
+      "- latestAmount:",
+      parsedLatestTransaction.amount
+    );
   } catch (error) {
     console.error(timeStamp(), "- Error: ", JSON.stringify(error));
     await sendDiscord("", "", "", "system");
