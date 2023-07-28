@@ -147,7 +147,9 @@ export async function checkNewTrans() {
       // Send Discord notification for the new transaction
       sendDiscord(
         Amount,
-        dayjs(PCTime, "HHmmss").format("dddd, DD/MM/YYYY HH:mm:ss"),
+        getTransTimeAsDayjs(formatNumberToSixDigits(PCTime)).format(
+          "dddd, DD/MM/YYYY HH:mm:ss"
+        ),
         Remark,
         "transaction"
       );
