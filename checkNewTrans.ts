@@ -114,7 +114,7 @@ export async function checkNewTrans() {
     const transactions = await getTodayTrans();
 
     if (transactions.length === 0) {
-      console.log(timeStamp(), "- No transactions found.");
+      console.log(timeStamp(), " - No transactions found.");
       return;
     }
 
@@ -123,7 +123,7 @@ export async function checkNewTrans() {
       latestTransactionObject = transactions[0];
       console.log(
         timeStamp(),
-        "- Initial latestTransactionObject set to:",
+        " - Initial latestTransactionObject set to: ",
         JSON.stringify(latestTransactionObject)
       );
       return;
@@ -140,7 +140,7 @@ export async function checkNewTrans() {
       const { Amount, PCTime, Remark } = transaction;
       console.log(
         timeStamp(),
-        "- New Transaction:",
+        " - New Transaction: ",
         JSON.stringify({ Amount, PCTime, Remark })
       );
 
@@ -162,12 +162,12 @@ export async function checkNewTrans() {
       const { Amount, Remark, Reference } = latestTransactionObject;
       console.log(
         timeStamp(),
-        "- No new transactions found. Current latestTransactionObject:",
+        " - No new transactions found. Current latestTransactionObject: ",
         JSON.stringify({ Amount, Remark, Reference })
       );
     }
   } catch (error) {
-    console.error(timeStamp(), "- Error: ", JSON.stringify(error));
+    console.error(timeStamp(), " - Error: ", JSON.stringify(error));
     await sendDiscord("", "", "", "system");
   }
 }
