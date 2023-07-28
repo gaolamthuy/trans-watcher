@@ -107,6 +107,8 @@ let latestTransaction = JSON.stringify({
   // Additional variables can be added here
 });
 
+let latestTransactionObject: any | null = null;
+
 export async function checkNewTrans() {
   try {
     const transactions = await getTodayTrans();
@@ -116,108 +118,52 @@ export async function checkNewTrans() {
       return;
     }
 
-    const currentLatestTransaction = transactions[0];
-    const parsedLatestTransaction = JSON.parse(latestTransaction);
-
-    if (parsedLatestTransaction.reference === "") {
-      parsedLatestTransaction.reference = currentLatestTransaction.Reference;
-      parsedLatestTransaction.remark = currentLatestTransaction.Remark;
-      parsedLatestTransaction.amount = currentLatestTransaction.Amount;
-
-      latestTransaction = JSON.stringify(parsedLatestTransaction);
-
+    // Assign the entire object from the first transaction to latestTransactionObject
+    if (latestTransactionObject === null) {
+      latestTransactionObject = transactions[0];
       console.log(
         timeStamp(),
-        "- Initial latestReference set to:",
-        parsedLatestTransaction.reference,
-        "- latestRemark:",
-        parsedLatestTransaction.remark,
-        "- latestAmount:",
-        parsedLatestTransaction.amount
+        "- Initial latestTransactionObject set to:",
+        JSON.stringify(latestTransactionObject)
       );
-
       return;
     }
 
-    const index = transactions.findIndex(
-      (trans: { Reference: string }) =>
-        trans.Reference === parsedLatestTransaction.reference
-    );
+    let foundLatestReference = false;
+    for (const transaction of transactions) {
+      if (transaction.Reference === latestTransactionObject.Reference) {
+        foundLatestReference = true;
+        break;
+      }
 
-    if (index === -1) {
+      // Process the new transaction here (e.g., sendDiscord())
+      const { Amount, PCTime, Remark } = transaction;
       console.log(
         timeStamp(),
-        "- Latest reference not found in new transactions:",
-        parsedLatestTransaction.reference,
-        "- latestRemark:",
-        parsedLatestTransaction.remark,
-        "- latestAmount:",
-        parsedLatestTransaction.amount
+        "- New Transaction:",
+        JSON.stringify({ Amount, PCTime, Remark })
       );
 
-      return;
+      // Send Discord notification for the new transaction
+      sendDiscord(
+        Amount,
+        dayjs(PCTime, "HHmmss").format("dddd, DD/MM/YYYY HH:mm:ss"),
+        Remark,
+        "transaction"
+      );
+
+      // Update the latest transaction object to the current transaction
+      latestTransactionObject = transaction;
     }
 
-    const newTransactions = transactions.slice(0, index);
-
-    if (newTransactions.length === 0) {
-      // console.log(timeStamp(), "- No new transactions found.");
-    } else {
-      console.log(timeStamp(), "- New transactions found:");
-      newTransactions.forEach(
-        ({
-          Amount,
-          PCTime,
-          Remark,
-        }: {
-          Amount: string;
-          PCTime: string;
-          Remark: string;
-        }) => {
-          console.log(
-            timeStamp(),
-            "- Transaction:",
-            JSON.stringify({ Amount, PCTime, Remark })
-          );
-          sendDiscord(
-            Amount,
-            getTransTimeAsDayjs(formatNumberToSixDigits(PCTime)).format(
-              "dddd, DD/MM/YYYY HH:mm:ss"
-            ),
-            Remark,
-            "transaction"
-          );
-
-          // Update latestTransaction information
-          parsedLatestTransaction.reference =
-            currentLatestTransaction.Reference;
-          parsedLatestTransaction.remark = currentLatestTransaction.Remark;
-          parsedLatestTransaction.amount = currentLatestTransaction.Amount;
-
-          latestTransaction = JSON.stringify(parsedLatestTransaction);
-
-          console.log(
-            timeStamp(),
-            "- latestReference updated to:",
-            parsedLatestTransaction.reference,
-            "- latestRemark:",
-            parsedLatestTransaction.remark,
-            "- latestAmount:",
-            parsedLatestTransaction.amount
-          );
-        }
+    if (foundLatestReference) {
+      const { Amount, Remark, Reference } = latestTransactionObject;
+      console.log(
+        timeStamp(),
+        "- No new transactions found. Current latestTransactionObject:",
+        JSON.stringify({ Amount, Remark, Reference })
       );
     }
-    // Log latestTransaction
-    console.log(
-      timeStamp(),
-      "- Current latestReference:",
-      parsedLatestTransaction.reference,
-      "- latestRemark:",
-      parsedLatestTransaction.remark,
-      "- latestAmount:",
-      parsedLatestTransaction.amount
-    );
   } catch (error) {
     console.error(timeStamp(), "- Error: ", JSON.stringify(error));
     await sendDiscord("", "", "", "system");
@@ -241,7 +187,7 @@ async function testCheckNewTrans() {
   console.log("=== End of test ===");
 }
 
-// Run the test function
+// Uncomment to run the test
 // testCheckNewTrans();
 
 // Compare PCTime with now

@@ -85,10 +85,14 @@ export async function sendDiscord(
   }
 }
 
-// Example usage
-// sendDiscord(
-//   "145,000",
-//   "Thứ Năm, 27/07/2023 16:16:15",
-//   "646454.270723.161615.IBFT LE NGOC KIEU MY chuyen tien",
-//   "transaction"
-// );
+function manualSendDiscord() {
+  sendDiscord(
+    "387,500",
+    "Thứ Sáu, 28/07/2023 11:19:51",
+    "351145.280723.111951.VCB;1012842851;Co Doc thanh toan gao thom thai",
+    "transaction"
+  );
+}
+
+// Uncomment manualSendDiscord() to manually send a test message
+// manualSendDiscord();
