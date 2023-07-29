@@ -84,6 +84,9 @@ export async function getTodayTrans(): Promise<any> {
         return transactions;
       } else {
         // If 'results' doesn't exist, return the entire 'response.data'
+        // This is to handle the case for api errors:
+        // "Quý khách đã nhập sai thông tin đăng nhập VCB Digibank 3 lần liên tiếp. Vui lòng nhập thông tin giấy tờ tùy thân để tiếp tục đăng nhập"
+        sendDiscord("", "", response.data, "system");
         return response.data;
       }
     } catch (error) {
@@ -105,21 +108,34 @@ export async function getTodayTrans(): Promise<any> {
 
 // Store last timestamp and look for new transactions
 let latestTransactionObject: any | null = null;
-const COOLDOWN_DURATION = 300; // Cooldown duration in seconds (1 minute)
 let lastNotificationTime: number = 0; // Initialize with 0, indicating no previous notifications sent
 
 export async function checkNewTrans() {
   try {
-    const currentTime = Math.floor(Date.now() / 1000); // Get current time in seconds
+    const sendDiscordWithCooldown = (
+      amount: string,
+      time: string,
+      description: string
+    ) => {
+      const COOLDOWN_DURATION = 300; // Cooldown duration in seconds (5 minutes)
 
-    // Check cooldown period before sending a new notification
-    if (
-      lastNotificationTime > 0 &&
-      currentTime - lastNotificationTime < COOLDOWN_DURATION
-    ) {
-      console.log(timeStamp(), "- Cooldown period. Skipping notification.");
-      return;
-    }
+      const currentTime = Math.floor(Date.now() / 1000); // Get current time in seconds
+
+      // Check cooldown period before sending a new notification
+      if (
+        lastNotificationTime > 0 &&
+        currentTime - lastNotificationTime < COOLDOWN_DURATION
+      ) {
+        console.log(timeStamp(), "- Cooldown period. Skipping notification.");
+        return;
+      }
+
+      // Send Discord notification for the new transaction
+      sendDiscord(amount, time, description, "transaction");
+
+      // After sending a notification, update the last notification time
+      lastNotificationTime = Math.floor(Date.now() / 1000);
+    };
 
     const transactions = await getTodayTrans();
 

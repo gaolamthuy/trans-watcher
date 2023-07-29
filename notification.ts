@@ -34,7 +34,8 @@ export async function sendDiscord(
 
   const payload =
     messageType === MessageTypes.TRANSACTION
-      ? {
+      ? // Transaction message
+        {
           username: "Nhận chuyển khoản VCB 1012.842.851",
           avatar_url: VCB_AVATAR_URL,
           content: `Nhận ${amount} VNĐ`,
@@ -56,7 +57,8 @@ export async function sendDiscord(
             },
           ],
         }
-      : {
+      : // System message
+        {
           embeds: [
             {
               title: "Máy chủ VCB đang gặp sự cố",
@@ -64,7 +66,7 @@ export async function sendDiscord(
               fields: [
                 {
                   name: "Máy chủ VCB đang gặp sự cố",
-                  value: timeStamp(),
+                  value: timeStamp() + "%0A" + description,
                 },
               ],
             },
