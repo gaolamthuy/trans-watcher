@@ -71,14 +71,21 @@ export async function getTodayTrans(): Promise<any> {
       };
 
       const response = await axios(config);
-      let transactions = response.data.results;
 
-      if (!Array.isArray(transactions)) {
-        // If transactions is not an array, wrap it in an array
-        transactions = [transactions];
+      // Check if 'response.data.results' exists
+      if ("results" in response.data) {
+        let transactions = response.data.results;
+
+        if (!Array.isArray(transactions)) {
+          // If transactions is not an array, wrap it in an array
+          transactions = [transactions];
+        }
+
+        return transactions;
+      } else {
+        // If 'results' doesn't exist, return the entire 'response.data'
+        return response.data;
       }
-
-      return transactions;
     } catch (error) {
       console.error(
         timeStamp(),
@@ -94,9 +101,6 @@ export async function getTodayTrans(): Promise<any> {
       }
     }
   }
-
-  // If all retries fail, you may want to return an empty array or throw an error
-  // job.stop();
 }
 
 // Store last timestamp and look for new transactions
