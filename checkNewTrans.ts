@@ -104,17 +104,23 @@ export async function getTodayTrans(): Promise<any> {
 }
 
 // Store last timestamp and look for new transactions
-let latestTransaction = JSON.stringify({
-  reference: "",
-  remark: "",
-  amount: "",
-  // Additional variables can be added here
-});
-
 let latestTransactionObject: any | null = null;
+const COOLDOWN_DURATION = 300; // Cooldown duration in seconds (1 minute)
+let lastNotificationTime: number = 0; // Initialize with 0, indicating no previous notifications sent
 
 export async function checkNewTrans() {
   try {
+    const currentTime = Math.floor(Date.now() / 1000); // Get current time in seconds
+
+    // Check cooldown period before sending a new notification
+    if (
+      lastNotificationTime > 0 &&
+      currentTime - lastNotificationTime < COOLDOWN_DURATION
+    ) {
+      console.log(timeStamp(), "- Cooldown period. Skipping notification.");
+      return;
+    }
+
     const transactions = await getTodayTrans();
 
     if (transactions.length === 0) {
@@ -170,6 +176,9 @@ export async function checkNewTrans() {
         JSON.stringify({ Amount, Remark, Reference })
       );
     }
+
+    // After sending a notification, update the last notification time
+    lastNotificationTime = Math.floor(Date.now() / 1000);
   } catch (error) {
     console.error(timeStamp(), " - Error: ", JSON.stringify(error));
     await sendDiscord("", "", "", "system");
