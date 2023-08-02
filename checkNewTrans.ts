@@ -196,8 +196,6 @@ function logTransactionArray(
         transactions.map(
           ({ Amount, TransactionDate, PCTime, Remark, Reference }) => ({
             Amount,
-            TransactionDate,
-            PCTime,
             Remark,
             Reference,
           })
