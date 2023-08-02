@@ -30,7 +30,10 @@ export function formatNumberToSixDigits(PCTime: string): string {
   return "";
 }
 
-export function getTransTimeAsDayjs(timeString: string): dayjs.Dayjs {
+export function getTransTimeAsDayjs(
+  dateString: string,
+  timeString: string
+): dayjs.Dayjs {
   const formattedDateTime = `${today()} ${timeString}`;
   const transDayjsObject = dayjs(formattedDateTime, "DD/MM/YYYY HHmmss");
   // console.log(
@@ -86,7 +89,7 @@ export async function getTodayTrans(): Promise<any> {
         // If 'results' doesn't exist, return the entire 'response.data'
         // This is to handle the case for api errors:
         // "Quý khách đã nhập sai thông tin đăng nhập VCB Digibank 3 lần liên tiếp. Vui lòng nhập thông tin giấy tờ tùy thân để tiếp tục đăng nhập"
-        sendDiscord("", "", response.data, "system");
+        sendDiscord("", "", JSON.stringify(response.data), "system");
         return response.data;
       }
     } catch (error) {
@@ -106,137 +109,223 @@ export async function getTodayTrans(): Promise<any> {
   }
 }
 
-// Store last timestamp and look for new transactions
-let latestTransactionObject: any | null = null;
-let lastNotificationTime: number = 0; // Initialize with 0, indicating no previous notifications sent
+let lastTransactions: any[] | null = null; // Store last transactions
 
 export async function checkNewTrans() {
   try {
-    const sendDiscordWithCooldown = (
-      amount: string,
-      time: string,
-      description: string
-    ) => {
-      const COOLDOWN_DURATION = 300; // Cooldown duration in seconds (5 minutes)
+    const checkingTransactions = await getTodayTrans();
 
-      const currentTime = Math.floor(Date.now() / 1000); // Get current time in seconds
+    if (lastTransactions === null) {
+      // Initialize lastTransactions with the result of the first call to getTodayTrans()
+      lastTransactions = checkingTransactions;
+      console.log(
+        timeStamp(),
+        " - Initial lastTransactions set to: ",
+        JSON.stringify(lastTransactions)
+      );
+      return;
+    }
 
-      // Check cooldown period before sending a new notification
-      if (
-        lastNotificationTime > 0 &&
-        currentTime - lastNotificationTime < COOLDOWN_DURATION
-      ) {
-        console.log(timeStamp(), "- Cooldown period. Skipping notification.");
-        return;
-      }
-
-      // Send Discord notification for the new transaction
-      sendDiscord(amount, time, description, "transaction");
-
-      // After sending a notification, update the last notification time
-      lastNotificationTime = Math.floor(Date.now() / 1000);
-    };
-
-    const transactions = await getTodayTrans();
-
-    if (transactions.length === 0) {
+    if (checkingTransactions.length === 0) {
       console.log(timeStamp(), " - No transactions found.");
       return;
     }
 
-    // Assign the entire object from the first transaction to latestTransactionObject
-    if (latestTransactionObject === null) {
-      latestTransactionObject = transactions[0];
+    // Find new transactions by comparing checkingTransactions and lastTransactions
+    const newTransactions = checkingTransactions.filter(
+      (transaction: any) =>
+        !lastTransactions!.some((t) => t.Reference === transaction.Reference)
+    );
+
+    if (newTransactions.length > 0) {
+      newTransactions.forEach((newTransaction: any) => {
+        const { Amount, PCTime, Remark, Reference, TransactionDate } =
+          newTransaction;
+        console.log(
+          timeStamp(),
+          " - New Transaction: ",
+          JSON.stringify({ Amount, PCTime, Remark, Reference })
+        );
+
+        // Send Discord notification for the new transaction
+        sendDiscord(
+          Amount,
+          getTransTimeAsDayjs(
+            TransactionDate,
+            formatNumberToSixDigits(PCTime)
+          ).format("dddd, DD/MM/YYYY HH:mm:ss"),
+          Remark,
+          "transaction"
+        );
+      });
+
+      // Update the lastTransactions array with the checkingTransactions array
+      lastTransactions = checkingTransactions;
+      // log the lastTransactions array
       console.log(
         timeStamp(),
-        " - Initial latestTransactionObject set to: ",
-        JSON.stringify(latestTransactionObject)
+        " - lastTransactions updated to: ",
+        JSON.stringify(lastTransactions)
       );
-      return;
-    }
-
-    let foundLatestReference = false;
-    for (const transaction of transactions) {
-      if (transaction.Reference === latestTransactionObject.Reference) {
-        foundLatestReference = true;
-        break;
-      }
-
-      // Process the new transaction here (e.g., sendDiscord())
-      const { Amount, PCTime, Remark } = transaction;
+    } else {
       console.log(
         timeStamp(),
-        " - New Transaction: ",
-        JSON.stringify({ Amount, PCTime, Remark })
-      );
-
-      // Send Discord notification for the new transaction
-      sendDiscord(
-        Amount,
-        getTransTimeAsDayjs(formatNumberToSixDigits(PCTime)).format(
-          "dddd, DD/MM/YYYY HH:mm:ss"
-        ),
-        Remark,
-        "transaction"
-      );
-
-      // Update the latest transaction object to the current transaction
-      latestTransactionObject = transaction;
-    }
-
-    if (foundLatestReference) {
-      const { Amount, Remark, Reference } = latestTransactionObject;
-      console.log(
-        timeStamp(),
-        " - No new transactions found. Current latestTransactionObject: ",
-        JSON.stringify({ Amount, Remark, Reference })
+        " - No new transactions found. Current lastTransactions: ",
+        JSON.stringify(lastTransactions)
       );
     }
-
-    // After sending a notification, update the last notification time
-    lastNotificationTime = Math.floor(Date.now() / 1000);
   } catch (error) {
     console.error(timeStamp(), " - Error: ", JSON.stringify(error));
     await sendDiscord("", "", "", "system");
   }
 }
 
+// Test function for checkNewTrans()
 async function testCheckNewTrans() {
-  console.log("=== Testing checkNewTrans ===");
+  try {
+    lastTransactions = [
+      {
+        tranDate: "31/07/2023",
+        TransactionDate: "31/07/2023",
+        Reference: "5209 - 33719",
+        CD: "+",
+        Amount: "1,500,000",
+        Description:
+          "159505.310723.222237.HUYNH THI KIM DUNG chuyen FT23212609136793",
+        PCTime: "222238",
+        DorCCode: "C",
+        EffDate: "2023-07-31",
+        PostingDate: "2023-07-31",
+        PostingTime: "222238",
+        Remark:
+          "159505.310723.222237.HUYNH THI KIM DUNG chuyen FT23212609136793",
+        SeqNo: "33719",
+        TnxCode: "34",
+        Teller: "5209",
+      },
+      {
+        tranDate: "29/07/2023",
+        TransactionDate: "29/07/2023",
+        Reference: "5273 - 94804",
+        CD: "-",
+        Amount: "44,000,000",
+        Description:
+          "IBVCB.3933442466.039547.HO PHAM LAM chuyen khoan.CT tu 1012842851 HO PHAM LAM toi 0938568040 HO PHAM LAM Ngan hang Tien phong (TPBANK)",
+        PCTime: "092015",
+        DorCCode: "D",
+        EffDate: "2023-07-29",
+        PostingDate: "2023-07-29",
+        PostingTime: "092015",
+        Remark:
+          "IBVCB.3933442466.039547.HO PHAM LAM chuyen khoan.CT tu 1012842851 HO PHAM LAM toi 0938568040 HO PHAM LAM Ngan hang Tien phong (TPBANK)",
+        SeqNo: "94804",
+        TnxCode: "74",
+        Teller: "5273",
+      },
+      {
+        tranDate: "28/07/2023",
+        TransactionDate: "28/07/2023",
+        Reference: "5209 - 11614",
+        CD: "+",
+        Amount: "387,500",
+        Description:
+          "351145.280723.111951.VCB;1012842851;Co Doc thanh toan gao thom thai",
+        PCTime: "111951",
+        DorCCode: "C",
+        EffDate: "2023-07-28",
+        PostingDate: "2023-07-28",
+        PostingTime: "111951",
+        Remark:
+          "351145.280723.111951.VCB;1012842851;Co Doc thanh toan gao thom thai",
+        SeqNo: "11614",
+        TnxCode: "34",
+        Teller: "5209",
+      },
+      {
+        tranDate: "28/07/2023",
+        TransactionDate: "28/07/2023",
+        Reference: "5209 - 9695",
+        CD: "+",
+        Amount: "2,363,000",
+        Description: "204314.280723.095343.IBFT Tien nep ngay 28 7",
+        PCTime: "095345",
+        DorCCode: "C",
+        EffDate: "2023-07-28",
+        PostingDate: "2023-07-28",
+        PostingTime: "095345",
+        Remark: "204314.280723.095343.IBFT Tien nep ngay 28 7",
+        SeqNo: "9695",
+        TnxCode: "34",
+        Teller: "5209",
+      },
+      {
+        tranDate: "28/07/2023",
+        TransactionDate: "28/07/2023",
+        Reference: "5209 - 28941",
+        CD: "+",
+        Amount: "440,000",
+        Description:
+          "133275.280723.070233.VCB;1012842851;DANG THI PHUONG LAN chuyen khoan",
+        PCTime: "070233",
+        DorCCode: "C",
+        EffDate: "2023-07-28",
+        PostingDate: "2023-07-28",
+        PostingTime: "070233",
+        Remark:
+          "133275.280723.070233.VCB;1012842851;DANG THI PHUONG LAN chuyen khoan",
+        SeqNo: "28941",
+        TnxCode: "34",
+        Teller: "5209",
+      },
+      {
+        tranDate: "27/07/2023",
+        TransactionDate: "27/07/2023",
+        Reference: "5214 - 48662",
+        CD: "+",
+        Amount: "145,000",
+        Description: "646454.270723.161615.IBFT LE NGOC KIEU MY chuyen tien",
+        PCTime: "161615",
+        DorCCode: "C",
+        EffDate: "2023-07-27",
+        PostingDate: "2023-07-27",
+        PostingTime: "161615",
+        Remark: "646454.270723.161615.IBFT LE NGOC KIEU MY chuyen tien",
+        SeqNo: "48662",
+        TnxCode: "34",
+        Teller: "5214",
+      },
+      {
+        tranDate: "27/07/2023",
+        TransactionDate: "27/07/2023",
+        Reference: "5078 - 92682",
+        CD: "+",
+        Amount: "130,000",
+        Description:
+          "MBVCB.3923584464.HOANG THUY TIEN chuyen tien.CT tu 0071001012273 HOANG THUY TIEN toi1012842851 HO PHAM LAM",
+        PCTime: "124653",
+        DorCCode: "C",
+        EffDate: "2023-07-27",
+        PostingDate: "2023-07-27",
+        PostingTime: "124653",
+        Remark:
+          "MBVCB.3923584464.HOANG THUY TIEN chuyen tien.CT tu 0071001012273 HOANG THUY TIEN toi1012842851 HO PHAM LAM",
+        SeqNo: "92682",
+        TnxCode: "34",
+        Teller: "5078",
+      },
+    ];
 
-  // First call to checkNewTrans
-  console.log("First checkNewTrans call:");
-  await checkNewTrans();
+    console.log("Running testCheckNewTrans...");
 
-  // Simulating some delay before the second call
-  await new Promise((resolve) => setTimeout(resolve, 5000));
+    // Simulate calling checkNewTrans() with the provided lastTransactions
+    await checkNewTrans();
 
-  // Second call to checkNewTrans
-  console.log("Second checkNewTrans call:");
-  await checkNewTrans();
-
-  console.log("=== End of test ===");
+    console.log("Test completed successfully!");
+  } catch (error) {
+    console.error("Test failed with error: ", error);
+  }
 }
 
-// Uncomment to run the test
+// Run the test function
 // testCheckNewTrans();
-
-// Compare PCTime with now
-// export async function checkNewTrans(
-//   secondsThreshold: number
-// ): Promise<Transaction[]> {
-//   // logic: parse PCTime to number and compare with now
-//   const transactions = await getTodayTrans();
-//   const nowMinus = getNowMinusSeconds(secondsThreshold);
-//   const nowMinusFormatted = parseInt(nowMinus.format("HHmmss"));
-//   const nowFormateted = parseInt(dayjs().format("HHmmss"));
-//   const newTransactions = transactions.filter((transaction: any) => {
-//     const pcTimeFormatted = parseInt(transaction.PCTime);
-//     // console.log("now: ", nowMinus.format("DD/MM/YY HH:mm:ss"));
-//     return (
-//       // (now-crontime) <= transactionPCTime < now
-//       pcTimeFormatted >= nowMinusFormatted && pcTimeFormatted < nowFormateted
-//     );
-//   });
-//   return newTransactions;
-// }
+// checkNewTrans()
