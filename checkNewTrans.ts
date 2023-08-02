@@ -17,12 +17,6 @@ export function timeStamp(): string {
   return dayjs().format("ddd, DD/MM/YYYY HH:mm:ss");
 }
 
-type Transaction = {
-  PCTime: string;
-  tranDate: string;
-  // Add other properties relevant to your transactions
-};
-
 export function formatNumberToSixDigits(PCTime: string): string {
   if (PCTime) {
     return PCTime.padStart(6, "0");
@@ -34,7 +28,7 @@ export function getTransTimeAsDayjs(
   dateString: string,
   timeString: string
 ): dayjs.Dayjs {
-  const formattedDateTime = `${today()} ${timeString}`;
+  const formattedDateTime = `${dateString} ${timeString}`;
   const transDayjsObject = dayjs(formattedDateTime, "DD/MM/YYYY HHmmss");
   // console.log(
   //   "transDayjsObject: ",
@@ -109,7 +103,26 @@ export async function getTodayTrans(): Promise<any> {
   }
 }
 
-let lastTransactions: any[] | null = null; // Store last transactions
+// Store last timestamp and look for new transactions
+let lastTransactions: Transaction[] | null = null;
+
+interface Transaction {
+  tranDate: string;
+  TransactionDate: string;
+  Reference: string;
+  CD: string;
+  Amount: string;
+  Description: string;
+  PCTime: string;
+  DorCCode: string;
+  EffDate: string;
+  PostingDate: string;
+  PostingTime: string;
+  Remark: string;
+  SeqNo: string;
+  TnxCode: string;
+  Teller: string;
+}
 
 export async function checkNewTrans() {
   try {
@@ -118,11 +131,7 @@ export async function checkNewTrans() {
     if (lastTransactions === null) {
       // Initialize lastTransactions with the result of the first call to getTodayTrans()
       lastTransactions = checkingTransactions;
-      console.log(
-        timeStamp(),
-        " - Initial lastTransactions set to: ",
-        JSON.stringify(lastTransactions)
-      );
+      logTransactionArray("Initial lastTransactions set to", lastTransactions);
       return;
     }
 
@@ -161,22 +170,42 @@ export async function checkNewTrans() {
 
       // Update the lastTransactions array with the checkingTransactions array
       lastTransactions = checkingTransactions;
-      // log the lastTransactions array
-      console.log(
-        timeStamp(),
-        " - lastTransactions updated to: ",
-        JSON.stringify(lastTransactions)
-      );
+      logTransactionArray("lastTransactions updated to", lastTransactions);
     } else {
-      console.log(
-        timeStamp(),
-        " - No new transactions found. Current lastTransactions: ",
-        JSON.stringify(lastTransactions)
+      logTransactionArray(
+        "No new transactions found. Current lastTransactions",
+        lastTransactions
       );
     }
   } catch (error) {
     console.error(timeStamp(), " - Error: ", JSON.stringify(error));
     await sendDiscord("", "", "", "system");
+  }
+}
+
+// Function to log a transaction array
+function logTransactionArray(
+  message: string,
+  transactions: Transaction[] | null
+) {
+  if (transactions) {
+    console.log(
+      timeStamp(),
+      ` - ${message}: `,
+      JSON.stringify(
+        transactions.map(
+          ({ Amount, TransactionDate, PCTime, Remark, Reference }) => ({
+            Amount,
+            TransactionDate,
+            PCTime,
+            Remark,
+            Reference,
+          })
+        )
+      )
+    );
+  } else {
+    console.log(timeStamp(), ` - ${message}: null`);
   }
 }
 
