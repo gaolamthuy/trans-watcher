@@ -8,7 +8,7 @@ enum MessageTypes {
 }
 
 const VCB_AVATAR_URL =
-  "https://raw.githubusercontent.com/hophamlam/trans-watchdog/main/assets/logo_vcb_1610091313.jpg";
+  "https://raw.githubusercontent.com/hophamlam/trans-watcher/main/assets/logo_vcb_1610091313.jpg";
 
 function capitalize(str: string, lower: boolean = false): string {
   return (lower ? str.toLowerCase() : str).replace(
